@@ -6,6 +6,7 @@ interface WorkspaceStore {
   snapshot: WorkspaceSnapshot;
   isLaunching: boolean;
   launchCodex: () => Promise<void>;
+  closeCodex: (instanceId: string) => Promise<void>;
   hydrateFromHost: () => Promise<void>;
   appendEvent: (event: WorkspaceEvent) => void;
 }
@@ -130,6 +131,27 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
     }, 900);
   },
 
+  closeCodex: async (instanceId) => {
+    const instanceName = get().snapshot.instances.find((instance) => instance.id === instanceId)?.name ?? "Codex";
+
+    try {
+      await window.multiCodex?.stopInstance(instanceId);
+    } catch {
+      // Browser preview has no Electron host, but the row can still be removed.
+    }
+
+    set(({ snapshot }) => ({
+      snapshot: appendEventToSnapshot(
+        {
+          ...snapshot,
+          selectedInstanceId: snapshot.selectedInstanceId === instanceId ? null : snapshot.selectedInstanceId,
+          instances: snapshot.instances.filter((instance) => instance.id !== instanceId)
+        },
+        localEvent(`${instanceName} closed`, "info", instanceId)
+      )
+    }));
+  },
+
   hydrateFromHost: async () => {
     try {
       const hostSnapshot = await window.multiCodex?.getSnapshot();
@@ -157,7 +179,8 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
       snapshot: event.instanceId
         ? updateInstance(appendEventToSnapshot(snapshot, event), event.instanceId, (instance) => ({
             ...instance,
-            status: event.level === "error" ? "crashed" : instance.status,
+            pid: event.instancePid !== undefined ? event.instancePid : instance.pid,
+            status: event.instanceStatus ?? (event.level === "error" ? "crashed" : instance.status),
             lastEvent: event.message,
             updatedAt: now()
           }))

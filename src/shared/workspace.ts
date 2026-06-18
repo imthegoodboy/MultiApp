@@ -31,6 +31,8 @@ export interface ManagedInstance {
 export interface WorkspaceEvent {
   id: string;
   instanceId?: string;
+  instanceStatus?: InstanceStatus;
+  instancePid?: number | null;
   level: WorkspaceEventLevel;
   message: string;
   timestamp: string;

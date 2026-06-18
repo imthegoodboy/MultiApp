@@ -1,13 +1,19 @@
 import { EventEmitter } from "node:events";
-import type { WorkspaceEvent, WorkspaceEventLevel } from "../../src/shared/workspace";
+import type { InstanceStatus, WorkspaceEvent, WorkspaceEventLevel } from "../../src/shared/workspace";
+
+interface WorkspaceEventPatch {
+  instanceStatus?: InstanceStatus;
+  instancePid?: number | null;
+}
 
 export class WorkspaceEventBus {
   private readonly emitter = new EventEmitter();
 
-  publish(level: WorkspaceEventLevel, message: string, instanceId?: string): WorkspaceEvent {
+  publish(level: WorkspaceEventLevel, message: string, instanceId?: string, patch: WorkspaceEventPatch = {}): WorkspaceEvent {
     const event: WorkspaceEvent = {
       id: crypto.randomUUID(),
       instanceId,
+      ...patch,
       level,
       message,
       timestamp: new Date().toISOString()

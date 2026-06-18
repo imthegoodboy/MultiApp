@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Loader2, Plus, MonitorUp } from "lucide-react";
+import { Loader2, Plus, MonitorUp, X } from "lucide-react";
 import { useWorkspaceStore } from "./store/workspaceStore";
 
 export function App() {
@@ -7,6 +7,7 @@ export function App() {
   const isLaunching = useWorkspaceStore((state) => state.isLaunching);
   const hydrateFromHost = useWorkspaceStore((state) => state.hydrateFromHost);
   const launchCodex = useWorkspaceStore((state) => state.launchCodex);
+  const closeCodex = useWorkspaceStore((state) => state.closeCodex);
 
   useEffect(() => {
     void hydrateFromHost();
@@ -37,7 +38,9 @@ export function App() {
         </button>
 
         <div className="mt-8 text-sm font-medium text-slate-300">
-          {snapshot.instances.length === 0 ? "No Codex windows launched yet" : `${snapshot.instances.length} Codex window${snapshot.instances.length === 1 ? "" : "s"} launched`}
+          {snapshot.instances.length === 0
+            ? "No Codex windows open yet"
+            : `${snapshot.instances.length} Codex window${snapshot.instances.length === 1 ? "" : "s"} open`}
         </div>
 
         <div className="mt-6 overflow-hidden rounded-lg border border-white/10 bg-white/[0.04] text-left">
@@ -45,7 +48,10 @@ export function App() {
             <div className="px-4 py-3 text-sm text-slate-500">Waiting for first launch.</div>
           ) : (
             snapshot.instances.map((instance) => (
-              <div key={instance.id} className="flex items-center justify-between gap-3 border-t border-white/10 px-4 py-3 first:border-t-0">
+              <div
+                key={instance.id}
+                className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 border-t border-white/10 px-4 py-3 first:border-t-0"
+              >
                 <div className="min-w-0">
                   <div className="truncate text-sm font-semibold text-slate-100">{instance.name}</div>
                   <div className="truncate text-xs text-slate-500">PID {instance.pid ?? "pending"}</div>
@@ -61,6 +67,15 @@ export function App() {
                 >
                   {instance.status}
                 </span>
+                <button
+                  type="button"
+                  aria-label={`Close ${instance.name}`}
+                  title={`Close ${instance.name}`}
+                  onClick={() => void closeCodex(instance.id)}
+                  className="flex h-8 w-8 items-center justify-center rounded-md border border-white/10 text-slate-400 transition hover:border-rose-400/40 hover:bg-rose-500/10 hover:text-rose-300"
+                >
+                  <X size={15} />
+                </button>
               </div>
             ))
           )}

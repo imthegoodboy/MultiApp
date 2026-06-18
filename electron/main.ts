@@ -22,7 +22,7 @@ if (process.env.MULTICODEX_USER_DATA_DIR) {
 function createDefaultSnapshot(): WorkspaceSnapshot {
   return {
     id: "default",
-    name: "AI Team Workspace",
+    name: "MultiCodex Launcher",
     layoutMode: "grid",
     selectedInstanceId: null,
     instances: [],
@@ -38,13 +38,13 @@ function createDefaultSnapshot(): WorkspaceSnapshot {
 
 async function createMainWindow(): Promise<void> {
   mainWindow = new BrowserWindow({
-    width: 1480,
-    height: 940,
-    minWidth: 1120,
-    minHeight: 760,
+    width: 680,
+    height: 760,
+    minWidth: 460,
+    minHeight: 560,
     show: false,
-    title: "MultiCodex Workspace",
-    backgroundColor: "#EEF2F6",
+    title: "MultiCodex",
+    backgroundColor: "#070A0F",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -101,7 +101,7 @@ async function bootstrap(): Promise<void> {
 
     return {
       ...stored,
-      instances: activeInstances.length > 0 ? activeInstances : stored.instances
+      instances: activeInstances
     };
   });
 
