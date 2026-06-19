@@ -33,13 +33,12 @@ test("launches a Codex desktop process from the plus button", async ({}, testInf
     await expect(appWindow.getByRole("heading", { name: "MultiCodex" })).toBeVisible();
     await expect(appWindow.getByText("No Codex windows open yet")).toBeVisible();
 
-    await appWindow.getByRole("button", { name: "Launch Codex" }).click();
-    await expect(appWindow.getByText("1 Codex window open")).toBeVisible();
-    await expect(appWindow.getByText("Codex #1", { exact: true })).toBeVisible();
-    await expect(appWindow.getByText("Running").first()).toBeVisible();
+    const launchButton = appWindow.getByRole("button", { name: "Launch Codex" });
+    await launchButton.click();
+    await launchButton.click();
 
-    await appWindow.getByRole("button", { name: "Launch Codex" }).click();
     await expect(appWindow.getByText("2 Codex windows open")).toBeVisible();
+    await expect(appWindow.getByText("Codex #1", { exact: true })).toBeVisible();
     await expect(appWindow.getByText("Codex #2", { exact: true })).toBeVisible();
 
     await expect

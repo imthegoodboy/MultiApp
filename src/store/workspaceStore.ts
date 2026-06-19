@@ -4,7 +4,7 @@ import type { ManagedInstance, WorkspaceEvent, WorkspaceSnapshot } from "../shar
 
 interface WorkspaceStore {
   snapshot: WorkspaceSnapshot;
-  isLaunching: boolean;
+  pendingLaunches: number;
   launchCodex: () => Promise<void>;
   closeCodex: (instanceId: string) => Promise<void>;
   hydrateFromHost: () => Promise<void>;
@@ -37,6 +37,18 @@ function localEvent(message: string, level: WorkspaceEvent["level"], instanceId?
     message,
     timestamp: now()
   };
+}
+
+let launchCounter = 0;
+
+function reserveLaunchIndex(snapshot: WorkspaceSnapshot): number {
+  const highestVisibleIndex = snapshot.instances.reduce((highest, instance) => {
+    const match = /^Codex #(\d+)$/.exec(instance.name);
+    return match ? Math.max(highest, Number(match[1])) : highest;
+  }, 0);
+
+  launchCounter = Math.max(launchCounter, highestVisibleIndex) + 1;
+  return launchCounter;
 }
 
 function makeLocalInstance(index: number): ManagedInstance {
@@ -76,19 +88,19 @@ function updateInstance(
 
 export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   snapshot: initialSnapshot,
-  isLaunching: false,
+  pendingLaunches: 0,
 
   launchCodex: async () => {
-    const { snapshot } = get();
-    const nextIndex = snapshot.instances.length + 1;
+    const nextIndex = reserveLaunchIndex(get().snapshot);
+    const name = `Codex #${nextIndex}`;
 
-    set({ isLaunching: true });
+    set(({ pendingLaunches }) => ({ pendingLaunches: pendingLaunches + 1 }));
 
     try {
-      const created = await window.multiCodex?.createInstance({ adapterId: "codex", name: `Codex #${nextIndex}` });
+      const created = await window.multiCodex?.createInstance({ adapterId: "codex", name });
 
       if (created) {
-        set(({ snapshot: current }) => ({
+        set(({ snapshot: current, pendingLaunches }) => ({
           snapshot: appendEventToSnapshot(
             {
               ...current,
@@ -97,7 +109,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
             },
             localEvent(`${created.name} launch requested`, "success", created.id)
           ),
-          isLaunching: false
+          pendingLaunches: Math.max(0, pendingLaunches - 1)
         }));
         return;
       }
@@ -106,7 +118,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
     }
 
     const created = makeLocalInstance(nextIndex);
-    set(({ snapshot: current }) => ({
+    set(({ snapshot: current, pendingLaunches }) => ({
       snapshot: appendEventToSnapshot(
         {
           ...current,
@@ -115,7 +127,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
         },
         localEvent(`${created.name} launch queued`, "success", created.id)
       ),
-      isLaunching: false
+      pendingLaunches: Math.max(0, pendingLaunches - 1)
     }));
 
     window.setTimeout(() => {

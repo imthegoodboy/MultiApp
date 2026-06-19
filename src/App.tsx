@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { Loader2, Plus, MonitorUp, X } from "lucide-react";
+import { Plus, MonitorUp, X } from "lucide-react";
 import { useWorkspaceStore } from "./store/workspaceStore";
 
 export function App() {
   const snapshot = useWorkspaceStore((state) => state.snapshot);
-  const isLaunching = useWorkspaceStore((state) => state.isLaunching);
+  const pendingLaunches = useWorkspaceStore((state) => state.pendingLaunches);
   const hydrateFromHost = useWorkspaceStore((state) => state.hydrateFromHost);
   const launchCodex = useWorkspaceStore((state) => state.launchCodex);
   const closeCodex = useWorkspaceStore((state) => state.closeCodex);
@@ -30,11 +30,11 @@ export function App() {
         <button
           type="button"
           aria-label="Launch Codex"
+          aria-busy={pendingLaunches > 0}
           onClick={() => void launchCodex()}
-          disabled={isLaunching}
-          className="mx-auto mt-10 flex h-28 w-28 items-center justify-center rounded-full border border-teal-300/40 bg-teal-400 text-[#041013] shadow-[0_0_60px_rgba(45,212,191,0.22)] transition hover:scale-[1.03] hover:bg-teal-300 disabled:cursor-wait disabled:opacity-70"
+          className="mx-auto mt-10 flex h-28 w-28 items-center justify-center rounded-full border border-teal-300/40 bg-teal-400 text-[#041013] shadow-[0_0_60px_rgba(45,212,191,0.22)] transition hover:scale-[1.03] hover:bg-teal-300"
         >
-          {isLaunching ? <Loader2 size={42} className="animate-spin" /> : <Plus size={52} strokeWidth={2.4} />}
+          <Plus size={52} strokeWidth={2.4} />
         </button>
 
         <div className="mt-8 text-sm font-medium text-slate-300">

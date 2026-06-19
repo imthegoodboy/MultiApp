@@ -39,7 +39,7 @@ export class ProcessSupervisor {
   }
 
   list(): ManagedInstance[] {
-    return [...this.instances.values()];
+    return [...this.instances.values()].filter((instance) => instance.status !== "stopped");
   }
 
   async create(request: { adapterId: string; name?: string; workspacePath?: string }): Promise<ManagedInstance> {
