@@ -14,38 +14,54 @@ export function App() {
   }, [hydrateFromHost]);
 
   const lastEvent = snapshot.events[0];
+  const openCount = snapshot.instances.length;
+  const openWindowLabel =
+    openCount === 0 ? "No Codex windows open yet" : `${openCount} Codex window${openCount === 1 ? "" : "s"} open`;
+  const launchStateLabel = pendingLaunches > 0 ? "Launching" : "Ready";
 
   return (
-    <div className="flex h-screen min-h-[620px] items-center justify-center bg-[#070A0F] p-6 text-white">
-      <main className="w-full max-w-[520px] text-center">
-        <div className="mx-auto mb-7 flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-teal-300">
-          <MonitorUp size={24} />
-        </div>
+    <div className="flex h-screen min-h-[620px] items-center justify-center bg-[#070A0F] p-5 text-slate-100">
+      <main className="flex h-full w-full max-w-[520px] flex-col">
+        <header className="flex items-center justify-between border-b border-white/10 pb-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/[0.06] text-teal-300">
+              <MonitorUp size={22} />
+            </div>
+            <div>
+              <h1 className="text-2xl font-semibold leading-tight">MultiCodex</h1>
+              <p className="text-xs font-medium uppercase text-slate-500">{launchStateLabel}</p>
+            </div>
+          </div>
 
-        <h1 className="text-3xl font-semibold leading-tight">MultiCodex</h1>
-        <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-slate-400">
-          Click plus to open another Codex desktop app window.
-        </p>
+          <div className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-right">
+            <div className="text-lg font-semibold leading-none text-white">{openCount}</div>
+            <div className="mt-1 text-[11px] font-medium uppercase text-slate-500">Open</div>
+          </div>
+        </header>
 
-        <button
-          type="button"
-          aria-label="Launch Codex"
-          aria-busy={pendingLaunches > 0}
-          onClick={() => void launchCodex()}
-          className="mx-auto mt-10 flex h-28 w-28 items-center justify-center rounded-full border border-teal-300/40 bg-teal-400 text-[#041013] shadow-[0_0_60px_rgba(45,212,191,0.22)] transition hover:scale-[1.03] hover:bg-teal-300"
-        >
-          <Plus size={52} strokeWidth={2.4} />
-        </button>
+        <section className="flex flex-1 flex-col items-center justify-center py-8 text-center">
+          <button
+            type="button"
+            aria-label="Launch Codex"
+            aria-busy={pendingLaunches > 0}
+            onClick={() => void launchCodex()}
+            className="flex h-28 w-28 items-center justify-center rounded-full border border-teal-200/50 bg-teal-300 text-[#03110F] shadow-[0_18px_80px_rgba(20,184,166,0.24)] transition hover:scale-[1.03] hover:bg-teal-200 focus:outline-none focus:ring-4 focus:ring-teal-300/20"
+          >
+            <Plus size={54} strokeWidth={2.35} />
+          </button>
 
-        <div className="mt-8 text-sm font-medium text-slate-300">
-          {snapshot.instances.length === 0
-            ? "No Codex windows open yet"
-            : `${snapshot.instances.length} Codex window${snapshot.instances.length === 1 ? "" : "s"} open`}
-        </div>
+          <div className="mt-7 text-sm font-medium text-slate-300">{openWindowLabel}</div>
+          {lastEvent ? <p className="mt-2 max-w-sm truncate text-xs text-slate-500">{lastEvent.message}</p> : null}
+        </section>
 
-        <div className="mt-6 overflow-hidden rounded-lg border border-white/10 bg-white/[0.04] text-left">
-          {snapshot.instances.length === 0 ? (
-            <div className="px-4 py-3 text-sm text-slate-500">Waiting for first launch.</div>
+        <section className="overflow-hidden rounded-lg border border-white/10 bg-white/[0.035] text-left shadow-2xl shadow-black/20">
+          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+            <div className="text-xs font-semibold uppercase text-slate-500">Codex Windows</div>
+            <div className="text-xs font-medium text-slate-400">{openCount} open</div>
+          </div>
+
+          {openCount === 0 ? (
+            <div className="px-4 py-4 text-sm text-slate-500">Nothing running.</div>
           ) : (
             snapshot.instances.map((instance) => (
               <div
@@ -72,16 +88,14 @@ export function App() {
                   aria-label={`Close ${instance.name}`}
                   title={`Close ${instance.name}`}
                   onClick={() => void closeCodex(instance.id)}
-                  className="flex h-8 w-8 items-center justify-center rounded-md border border-white/10 text-slate-400 transition hover:border-rose-400/40 hover:bg-rose-500/10 hover:text-rose-300"
+                  className="flex h-8 w-8 items-center justify-center rounded-md border border-white/10 text-slate-400 transition hover:border-rose-400/40 hover:bg-rose-500/10 hover:text-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-400/20"
                 >
                   <X size={15} />
                 </button>
               </div>
             ))
           )}
-        </div>
-
-        {lastEvent ? <p className="mt-4 text-xs text-slate-500">{lastEvent.message}</p> : null}
+        </section>
       </main>
     </div>
   );

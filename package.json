@@ -2,7 +2,7 @@
   "name": "multicodex-workspace",
   "version": "0.1.0",
   "private": true,
-  "description": "Desktop workspace manager for multiple isolated Codex UI instances.",
+  "description": "Simple desktop launcher for multiple isolated Codex app windows.",
   "main": "dist-electron/electron/main.js",
   "scripts": {
     "dev": "concurrently -k -n VITE,ELECTRON -c cyan,magenta \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && electron .\"",
@@ -41,7 +41,7 @@
   },
   "build": {
     "appId": "dev.multicodex.workspace",
-    "productName": "MultiCodex Workspace",
+    "productName": "MultiCodex",
     "directories": {
       "output": "release"
     },
@@ -50,8 +50,17 @@
       "dist-electron/**/*",
       "package.json"
     ],
+    "artifactName": "MultiCodex-${version}-Setup.${ext}",
     "win": {
       "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MultiCodex"
     }
   }
 }
