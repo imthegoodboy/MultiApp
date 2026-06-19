@@ -10,6 +10,7 @@ import { createWorkspaceRepository, type WorkspaceRepository } from "./services/
 import { PlatformWindowManager } from "./services/windowManager";
 
 const logger = pino({ name: "multicodex-main" });
+const appIconPath = path.join(__dirname, "../../assets/icon.ico");
 
 let mainWindow: BrowserWindow | null = null;
 let repository: WorkspaceRepository;
@@ -17,6 +18,12 @@ let supervisor: ProcessSupervisor;
 
 if (process.env.MULTICODEX_USER_DATA_DIR) {
   app.setPath("userData", process.env.MULTICODEX_USER_DATA_DIR);
+}
+
+app.setName("MultiCodex");
+
+if (process.platform === "win32") {
+  app.setAppUserModelId("dev.multicodex.workspace");
 }
 
 function createDefaultSnapshot(): WorkspaceSnapshot {
@@ -45,6 +52,7 @@ async function createMainWindow(): Promise<void> {
     show: false,
     title: "MultiCodex",
     backgroundColor: "#070A0F",
+    icon: appIconPath,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,

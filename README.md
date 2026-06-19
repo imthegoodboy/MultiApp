@@ -10,7 +10,7 @@ Download the latest Windows installer from the GitHub Releases page:
 
 https://github.com/imthegoodboy/MultiApp/releases
 
-Run `MultiCodex-0.1.0-Setup.exe` and follow the setup wizard. The installer creates Start Menu and desktop shortcuts.
+Run the latest `MultiCodex-*-Setup.exe` file and follow the setup wizard. The installer creates Start Menu and desktop shortcuts with the MultiCodex icon.
 
 Windows may show a SmartScreen warning because this first release is not code-signed. Choose the standard "More info" and "Run anyway" flow only if you trust this repository and release.
 
@@ -41,6 +41,7 @@ Each Codex launch is separate:
 - existing Codex windows keep running when another one is launched
 - closing MultiCodex does not close already-launched Codex windows
 - the row `X` button closes only that one launched Codex instance
+- the installed app, window, taskbar, installer, and shortcuts use the MultiCodex icon
 
 Each launched process receives these environment variables:
 

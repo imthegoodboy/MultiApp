@@ -1,7 +1,8 @@
 {
   "name": "multicodex-workspace",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
+  "author": "imthegoodboy",
   "description": "Simple desktop launcher for multiple isolated Codex app windows.",
   "main": "dist-electron/electron/main.js",
   "scripts": {
@@ -48,13 +49,18 @@
     "files": [
       "dist/**/*",
       "dist-electron/**/*",
+      "assets/**/*",
       "package.json"
     ],
+    "icon": "assets/icon.ico",
     "artifactName": "MultiCodex-${version}-Setup.${ext}",
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "assets/icon.ico"
     },
     "nsis": {
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
